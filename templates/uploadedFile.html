@@ -29,16 +29,16 @@
     <div class="space-y-4">
         <div>
             <label class="block text-sm font-medium text-gray-700">File Name:</label>
-            <p class="mt-1 text-gray-900">example.txt</p>
+            <p class="mt-1 text-gray-900">{{.FileName}}</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700">File Size:</label>
-            <p class="mt-1 text-gray-900">1234 bytes</p>
+            <p class="mt-1 text-gray-900">{{.FileSize}}</p>
         </div>
         <div class="text-center">
-            <button class="neumorphism-button px-4 py-2 text-gray-700 font-semibold">
+            <a href="/" class="neumorphism-button px-4 py-2 text-gray-700 font-semibold">
                 Back to Upload
-            </button>
+            </a>
         </div>
     </div>
 </div>

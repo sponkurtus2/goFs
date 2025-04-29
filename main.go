@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"time"
@@ -9,42 +10,59 @@ import (
 
 const Addr = ":8080"
 
+var uploadedFile *MyFile
+
 type MyFile struct {
-	fileName string
-	fileSize int64
+	FileName string
+	FileSize int64
 }
 
-type UploadHandler struct{ file *MyFile }
+type UploadHandler struct{}
 
 func (uh *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
-	r.ParseMultipartForm(10 << 20)
+	err := r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		http.Error(w, "Unable to parse form", http.StatusBadRequest)
+		return
+	}
 
 	f, fh, err := r.FormFile("file")
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, "Error retrieving the file", http.StatusInternalServerError)
+		return
 	}
 	defer f.Close()
 
-	fmt.Printf("File name -> %s, File Size -> %d\n", fh.Filename, fh.Size)
-
-	uploadedFile := &MyFile{
-		fileName: fh.Filename,
-		fileSize: fh.Size,
+	uploadedFile = &MyFile{
+		FileName: fh.Filename,
+		FileSize: fh.Size,
 	}
 
-	fmt.Fprintf(w, "Uploades file with name: %s, and size: %d\n", uploadedFile.fileName, uploadedFile.fileSize)
+	http.Redirect(w, r, "/fileInfo", http.StatusSeeOther)
 }
 
 func openIndexView(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "http://localhost:63343/microServices/front/", http.StatusSeeOther)
+	tmpl, err := template.ParseFiles("templates/index.html")
+	if err != nil {
+		http.Error(w, "Error loading template", http.StatusInternalServerError)
+		return
+	}
+	tmpl.Execute(w, nil)
+}
+
+func openUploadedFileView(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("templates/uploadedFile.html")
+	if err != nil {
+		http.Error(w, "Error loading template", http.StatusInternalServerError)
+		return
+	}
+	tmpl.Execute(w, uploadedFile)
 }
 
 func main() {
-
 	mux := http.NewServeMux()
-
 	mux.HandleFunc("/", openIndexView)
+	mux.HandleFunc("/fileInfo", openUploadedFileView)
 	mux.Handle("/upload", &UploadHandler{})
 
 	s := &http.Server{
@@ -57,7 +75,6 @@ func main() {
 
 	fmt.Printf("Starting server on: %s\n", Addr)
 	if err := s.ListenAndServe(); err != nil {
-		fmt.Printf("Server failed: %s\n", err)
+		log.Fatalf("Server failed: %s\n", err)
 	}
-
 }
