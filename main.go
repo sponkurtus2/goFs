@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,10 +13,10 @@ import (
 )
 
 //go:embed templates/index.html
-var indexPage string
+var indexPage embed.FS
 
 //go:embed templates/uploadedFile.html
-var uploadedFilePage string
+var uploadedFilePage embed.FS
 
 var uploadedFile *MyFile
 

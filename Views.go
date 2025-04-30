@@ -6,7 +6,7 @@ import (
 )
 
 func openIndexView(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("templates/index.html")
+	tmpl, err := template.ParseFS(indexPage, "templates/index.html")
 	if err != nil {
 		http.Error(w, "Error loading template", http.StatusInternalServerError)
 		return
@@ -15,7 +15,7 @@ func openIndexView(w http.ResponseWriter, r *http.Request) {
 }
 
 func openUploadedFileView(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("templates/uploadedFile.html")
+	tmpl, err := template.ParseFS(uploadedFilePage, "templates/uploadedFile.html")
 	if err != nil {
 		http.Error(w, "Error loading template", http.StatusInternalServerError)
 		return
