@@ -2,61 +2,27 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"time"
+
+	_ "embed"
+	_ "github.com/joho/godotenv/autoload"
 )
 
-const Addr = ":8080"
+//go:embed templates/index.html
+var indexPage string
+
+//go:embed templates/uploadedFile.html
+var uploadedFilePage string
 
 var uploadedFile *MyFile
 
 type MyFile struct {
-	FileName string
-	FileSize int64
-}
-
-type UploadHandler struct{}
-
-func (uh *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(10 << 20)
-	if err != nil {
-		http.Error(w, "Unable to parse form", http.StatusBadRequest)
-		return
-	}
-
-	f, fh, err := r.FormFile("file")
-	if err != nil {
-		http.Error(w, "Error retrieving the file", http.StatusInternalServerError)
-		return
-	}
-	defer f.Close()
-
-	uploadedFile = &MyFile{
-		FileName: fh.Filename,
-		FileSize: fh.Size,
-	}
-
-	http.Redirect(w, r, "/fileInfo", http.StatusSeeOther)
-}
-
-func openIndexView(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("templates/index.html")
-	if err != nil {
-		http.Error(w, "Error loading template", http.StatusInternalServerError)
-		return
-	}
-	tmpl.Execute(w, nil)
-}
-
-func openUploadedFileView(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("templates/uploadedFile.html")
-	if err != nil {
-		http.Error(w, "Error loading template", http.StatusInternalServerError)
-		return
-	}
-	tmpl.Execute(w, uploadedFile)
+	FileName     string
+	FileSize     int64
+	DownloadLink string
 }
 
 func main() {
@@ -65,15 +31,20 @@ func main() {
 	mux.HandleFunc("/fileInfo", openUploadedFileView)
 	mux.Handle("/upload", &UploadHandler{})
 
-	s := &http.Server{
-		Addr:         Addr,
-		Handler:      mux,
-		IdleTimeout:  120 * time.Second,
-		ReadTimeout:  1 * time.Second,
-		WriteTimeout: 1 * time.Second,
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = ":8080"
 	}
 
-	fmt.Printf("Starting server on: %s\n", Addr)
+	s := &http.Server{
+		Addr:         port,
+		Handler:      mux,
+		IdleTimeout:  120 * time.Second,
+		ReadTimeout:  2 * time.Second,
+		WriteTimeout: 2 * time.Second,
+	}
+
+	fmt.Printf("Starting server on: %s\n", port)
 	if err := s.ListenAndServe(); err != nil {
 		log.Fatalf("Server failed: %s\n", err)
 	}

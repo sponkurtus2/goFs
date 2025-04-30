@@ -4,39 +4,238 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload File</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        .neumorphism-button {
-            background: #e0e0e0;
+        :root {
+            --primary: #7FB77E;
+            --primary-dark: #638863;
+            --surface: #F7F7F7;
+            --depth-light: #FFFFFF;
+            --depth-dark: #E5E5E5;
+        }
+
+        body {
+            background: linear-gradient(135deg, #F9F9F9 0%, #EFF5EE 100%);
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .upload-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05),
+            0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .card-inner {
+            transform: translateZ(20px);
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 24px;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 20px;
+            margin-bottom: 24px;
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .file-input-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .file-input-label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            min-height: 120px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(245, 245, 245, 0.8) 100%);
+            border: 2px dashed rgba(127, 183, 126, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            padding: 20px;
+        }
+
+        .file-input-wrapper:hover {
+            border-color: var(--primary);
+            background: rgba(127, 183, 126, 0.05);
+        }
+
+        .file-input-wrapper::before {
+            content: "";
+            width: 48px;
+            height: 48px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%237FB77E' viewBox='0 0 24 24'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z'/%3E%3Cpath d='M14 3v5h5m-8 7h6m-3 3v-6'/%3E%3C/svg%3E") no-repeat center;
+            margin-bottom: 12px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-wrapper.has-file::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%237FB77E' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
+        }
+
+        .file-input-text {
+            color: var(--primary-dark);
+            font-weight: 500;
+            font-size: 16px;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .file-input-subtext {
+            color: #999;
+            font-size: 13px;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        .file-name-display {
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: rgba(127, 183, 126, 0.1);
+            border-radius: 8px;
+            color: var(--primary-dark);
+            font-size: 14px;
+            word-break: break-all;
+            text-align: center;
+            display: none;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+        }
+
+        .upload-button {
+            width: 100%;
+            padding: 16px;
             border-radius: 12px;
-            box-shadow:  5px 5px 10px #bebebe,
-            -5px -5px 10px #ffffff;
-            transition: box-shadow 0.2s ease-in-out;
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 2px 5px rgba(127, 183, 126, 0.2),
+            0 4px 12px rgba(127, 183, 126, 0.1);
         }
-        .neumorphism-button:hover {
-            box-shadow:  2px 2px 5px #bebebe,
-            -2px -2px 5px #ffffff;
+
+        .upload-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(127, 183, 126, 0.3),
+            0 6px 16px rgba(127, 183, 126, 0.2);
         }
-        .neumorphism-button:active {
-            box-shadow: inset 2px 2px 5px #bebebe,
-            inset -2px -2px 5px #ffffff;
+
+        .upload-button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-<div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
-    <h1 class="text-2xl font-bold mb-4 text-center">Upload File</h1>
-    <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data" class="space-y-4">
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Select a file</label>
-            <input type="file" name="file" class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
-        <div class="text-center">
-            <button type="submit" class="neumorphism-button px-4 py-2 text-gray-700 font-semibold">
-                Upload
-            </button>
-        </div>
-    </form>
+<body>
+<div class="upload-card">
+    <div class="card-inner">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">GoFs - A simple Go file exchanger</h1>
+        <h2 class="text-xl font-semibold text-gray-600 mb-6">Upload Your File</h2>
+        <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data">
+            <div class="file-input-container">
+                <label class="file-input-label">Select file to upload</label>
+                <div class="file-input-wrapper" id="dropZone">
+                    <input type="file" name="file" id="fileInput" class="file-input">
+                    <div class="file-input-text">Drag & drop files here</div>
+                    <div class="file-input-subtext">or click to browse</div>
+                    <div class="file-name-display" id="fileNameDisplay"></div>
+                </div>
+            </div>
+            <button type="submit" class="upload-button" id="uploadButton" disabled>Upload File</button>
+        </form>
+    </div>
 </div>
+
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const uploadButton = document.getElementById('uploadButton');
+    const dropZone = document.getElementById('dropZone');
+
+    fileInput.addEventListener('change', function (e) {
+        if (this.files.length > 0) {
+            const fileName = this.files[0].name;
+            fileNameDisplay.textContent = fileName;
+            fileNameDisplay.style.display = 'block';
+            dropZone.classList.add('has-file');
+            uploadButton.disabled = false;
+
+            // Cambiar el texto del botón
+            uploadButton.textContent = `Upload ${this.files[0].name}`;
+        } else {
+            fileNameDisplay.style.display = 'none';
+            dropZone.classList.remove('has-file');
+            uploadButton.disabled = true;
+            uploadButton.textContent = 'Upload File';
+        }
+    });
+
+    // Manejar drag and drop
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = 'var(--primary)';
+        dropZone.style.backgroundColor = 'rgba(127, 183, 126, 0.1)';
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.style.borderColor = 'rgba(127, 183, 126, 0.4)';
+        dropZone.style.backgroundColor = 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(245,245,245,0.8) 100%)';
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileInput.files = e.dataTransfer.files;
+        const event = new Event('change');
+        fileInput.dispatchEvent(event);
+    });
+</script>
 </body>
 </html>
