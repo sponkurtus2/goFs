@@ -34,11 +34,11 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = ":8080"
+		port = "8080"
 	}
 
 	s := &http.Server{
-		Addr:         port,
+		Addr:         ":" + port,
 		Handler:      mux,
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  2 * time.Second,
