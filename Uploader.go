@@ -23,7 +23,7 @@ type gofileUploadResponse struct {
 }
 
 func (uh *UploadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(10 << 20)
+	err := r.ParseMultipartForm(300 << 20) // 300 max MB per File
 	if err != nil {
 		http.Error(w, "Unable to parse form", http.StatusBadRequest)
 		return
