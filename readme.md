@@ -12,7 +12,7 @@ A simple Golang-based web application for uploading and viewing file information
 ## Tech Stack
 - **Backend**: Golang (`net/http`, `embed`)
 - **Frontend**: HTML, CSS
-- **Deployment**: Render (https://gofs.onrender.com/upload)
+- **Deployment**: Render (https://gofs.onrender.com/)
 
 ## Usage
 
